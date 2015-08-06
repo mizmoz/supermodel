@@ -19,10 +19,37 @@ class User extends Model
     // add name field with validation
     'name' => self::type(self::STRING)->max(10)->notEmpty(),
     
+    // email field, we'll add some customer validation below using validateEmail()
+    'email' => self::type(self::EMAIL),
+    
+    // this uses external validation
+    'postcode' => self::type(self::CUSTOM)->use('ValidatePost'),
+    
     // add basic field with no validation
     'extra'
   ];
+  
+  /**
+   * Validate the email address before adding to the model
+   * @param string $value
+   * @param string $type
+   */
+  public function validateEmail($value, $type)
+  {
+    // some custom validation
+    return (strpos($value, '@') !== false);
+  }
 }
+
+// Add custom validator globally
+Model::addValidator(function ($field, $value, $type) {
+  return true;
+});
+
+// User only validator
+User::addValidator(function ($field, $value, $type) {
+  return true;
+});
 
 $user = new User();
 ```
