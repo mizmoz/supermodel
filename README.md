@@ -12,44 +12,32 @@ class User extends Model
   // if $fields are defined the default setting is to only allow field names defined in there.
   // We can override this by setting $fieldsAreStrict. Now we have some field names defined but are free to add more
   protected $fieldsAreStrict = false;
-
-  // field definitions are optional, without them Supermodel acts as a key => value store
-  protected $fields = [
   
-    // add name field with validation
-    'name' => self::type(self::STRING)->max(10)->notEmpty(),
-    
-    // email field, we'll add some customer validation below using validateEmail()
-    'email' => self::type(self::EMAIL),
-    
-    // this uses external validation
-    'postcode' => self::type(self::CUSTOM)->use('ValidatePost'),
-    
-    // add basic field with no validation
-    'extra'
-  ];
-  
-  /**
-   * Validate the email address before adding to the model
-   * @param string $value
-   * @param string $type
-   */
-  public function validateEmail($value, $type)
+  // create an array with the field definitions in
+  protected function setup()
   {
-    // some custom validation
-    return (strpos($value, '@') !== false);
+    return [
+      // add name field with validation
+      'name' => Type::build('String')->max(10),
+      
+      // basic type validation
+      'age' => Type::build('Integer'),
+      
+      // email address
+      'email' => Type::build('Email')->notEmpty(),
+      
+      // no validation
+      'extra'
+    ];
   }
 }
 
-// Add custom validator globally
-Model::addValidator(function ($field, $value, $type) {
-  return true;
-});
-
-// User only validator
-User::addValidator(function ($field, $value, $type) {
-  return true;
-});
-
+// create the object
 $user = new User();
+
+// set valid name
+$user->name = 'Ian';
+
+// set invalid email, this throws a \Mizmoz\Supermodel\Exceptions\ValidationException
+$user->email = '';
 ```
